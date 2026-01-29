@@ -27,9 +27,9 @@ class ProjectModel(Base):
 
     # QUAN HỆ:
     # Một dự án có nhiều cột mốc
-    milestones = relationship('ProjectMilestone', backref='project', cascade="all, delete-orphan", lazy=True)
+    milestones = relationship('ProjectMilestoneModel', backref='project', cascade="all, delete-orphan", lazy=True)
     # Một dự án có thể được gán cho nhiều lớp (Thông qua bảng trung gian ProjectAllocation - sẽ tạo sau hoặc dùng quan hệ 1-n)
-    # teams = relationship('Team', backref='project', lazy=True)
+    # teams = relationship('TeamModel', backref='project', lazy=True)
 
 class ProjectMilestoneModel(Base):
     __tablename__ = 'project_milestones'
@@ -43,4 +43,4 @@ class ProjectMilestoneModel(Base):
     # Hạn nộp bài (tính theo số tuần kể từ khi bắt đầu, hoặc ngày cụ thể)
     due_week = Column(Integer, nullable=True) # VD: Tuần thứ 3
     # Quan hệ với Checkpoint (Cột mốc thực tế của từng nhóm)
-    # checkpoints = relationship('Checkpoint', backref='milestone', lazy=True)
+    # checkpoints = relationship('CheckpointModel', backref='milestone', lazy=True)

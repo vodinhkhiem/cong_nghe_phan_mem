@@ -12,7 +12,7 @@ class CheckpointModel(Base):
     # Trạng thái nộp bài của nhóm cho cột mốc này
     status = Column(String(20), default='Open') # 'Open', 'Submitted', 'Graded', 'Late'
     
-    submissions = relationship('Submission', backref='checkpoint', lazy=True)
+    submissions = relationship('SubmissionModel', backref='checkpoint', lazy=True)
 
 class SubmissionModel(Base):
     __tablename__ = 'submissions'

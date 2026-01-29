@@ -11,7 +11,7 @@ class SubjectModel(Base):
     description = Column(Text, nullable=True)
     
     # Quan hệ ngược để truy cập từ Syllabus
-    syllabuses = relationship('Syllabus', backref='subject', lazy=True)
+    syllabuses = relationship('SyllabusModel', backref='subject', lazy=True)
 
 class SyllabusModel(Base):
     __tablename__ = 'syllabuses'
@@ -31,9 +31,9 @@ class ClassModel(Base):
     semester = Column(String(20))  # Ví dụ: Fall 2023
     
     # Quan hệ
-    students = relationship('ClassMember', backref='class_info', lazy=True)
+    students = relationship('ClassMemberModel', backref='class_info', lazy=True)
     # teams sẽ được định nghĩa trong model Team, dùng backref ở đó để liên kết ngược
-    teams = relationship('Team', backref='class_info', lazy=True)
+    teams = relationship('TeamModel', backref='class_info', lazy=True)
 
 class ClassMemberModel(Base):
     __tablename__ = 'class_members'
