@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  # --- Dịch vụ 1: SQL Server ---
+  db-sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server_container
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Khiem1234Khiem@
+    ports:
+      - "1434:1433" # Cổng Ngoài 1434 (để tránh trùng với Win) -> Cổng Trong 1433
+    mem_limit: 2g # <--- QUAN TRỌNG: Giới hạn 2GB RAM để không bị sập máy (Fix lỗi 137)
+    networks:
+      - my-app-network
+
+  # --- Dịch vụ 2: Flask Web App ---
+  web-app:
+    build: .
+    container_name: flask_app_container
+    ports:
+      - "9999:9999"
+    depends_on:
+      - db-sql
+    volumes:
+      - .:/app # Link thư mục code ở ngoài vào trong (sửa code là ăn ngay)
+    environment:
+      - DB_SERVER=db-sql
+      - DB_USER=sa
+      - DB_PASSWORD=Khiem1234Khiem@
+      - DB_NAME=HTHT
+    networks:
+      - my-app-network
+
+networks:
+  my-app-network:
+    driver: bridge
