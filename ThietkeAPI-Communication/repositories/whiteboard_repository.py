@@ -1,19 +1,14 @@
-from models.whiteboard import Whiteboard
 class WhiteboardRepository:
-    _boards = {}
+    def __init__(self):
+        # key: project_id, value: state (dict)
+        self.boards = {}
 
-    def create(self, meeting_id):
-        if meeting_id not in self._boards:
-            board = Whiteboard(meeting_id)
-            self._boards[meeting_id] = board
-        return self._boards[meeting_id]
+    def create(self, project_id):
+        if project_id not in self.boards:
+            self.boards[project_id] = {}
 
-    def get_by_meeting_id(self, meeting_id):
-        return self._boards.get(meeting_id)
+    def get_state(self, project_id):
+        return self.boards.get(project_id, {})
 
-    def save_state(self, meeting_id, state):
-        board = self.get_by_meeting_id(meeting_id)
-        if not board:
-            raise Exception("Whiteboard not found")
-        board.state = state
-        return board
+    def save_snapshot(self, project_id, state):
+        self.boards[project_id] = state

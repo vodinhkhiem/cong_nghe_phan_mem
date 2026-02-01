@@ -1,27 +1,21 @@
-# data/whiteboard_data.py
-
-from models.whiteboard import Whiteboard
-
-class WhiteboardData:
+# whiteboard_data.py
+class WhiteboardRepository:
     def __init__(self):
-        # dict dùng như Hash Table
-        # Giải thuật: Hash Map lookup O(1)
-        self.whiteboards = {}
+        self.boards = {}  # key = project_id
 
-        # Khởi tạo dữ liệu mẫu
-        self.whiteboards["P001"] = Whiteboard(
-            "P001",
-            {
-                "shapes": ["rectangle", "circle"],
-                "texts": ["Sprint goal"]
+    def create(self, project_id):
+        self.boards[project_id] = {
+            "project_id": project_id,
+            "state": {
+                "shapes": [],
+                "texts": []
             }
-        )
+        }
+        return self.boards[project_id]
 
-    def get_state(self, project_id):
-        # O(1) average – tra cứu dict
-        return self.whiteboards.get(project_id)
+    def get_by_project_id(self, project_id):
+        return self.boards.get(project_id)
 
-    def save_snapshot(self, project_id, new_state):
-        # Ghi đè snapshot hiện tại
-        self.whiteboards[project_id] = Whiteboard(project_id, new_state)
-        return self.whiteboards[project_id]
+    def save_state(self, project_id, state):
+        if project_id in self.boards:
+            self.boards[project_id]["state"] = state
