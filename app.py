@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from analytics import router as analytics_router
-from ai import router as ai_router
+from ai import ai_router
 
 app = FastAPI(
     title="Learning Analytics & AI API",

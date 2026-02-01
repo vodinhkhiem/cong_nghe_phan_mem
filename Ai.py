@@ -1,11 +1,8 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from datetime import datetime
-from typing import List
+from typing import List, Dict
 
-ai_router = APIRouter()
-
-chat_history = []
+ai_router = APIRouter(prefix="/ai", tags=["AI"])
 
 class ChatRequest(BaseModel):
     message: str
@@ -21,31 +18,49 @@ class CodeExplainRequest(BaseModel):
 class ResourceRequest(BaseModel):
     topic: str
 
-@ai_router.post("/ai/chat")
+
+chat_history: List[Dict] = []
+
+@ai_router.post("/chat")
 def ai_chat(request: ChatRequest):
     reply = f"[AI hỗ trợ học tập] {request.message}"
 
     chat_history.append({
         "conversation_id": request.conversation_id,
         "question": request.message,
-        "answer": reply,
-        "time": datetime.now().isoformat()
+        "reply": reply
     })
 
     return {
         "status": "success",
-        "reply": reply
+        "reply": reply,
+        "conversation_id": request.conversation_id
     }
 
-@ai_router.post("/ai/tasks/{task_id}/breakdown")
+@ai_router.post("/tasks/{task_id}/breakdown")
 def breakdown_task(task_id: int, request: TaskBreakdownRequest):
-    checklist = [
-        "Phân tích yêu cầu bài toán",
-        "Xác định chức năng chính",
-        "Thiết kế Use Case / Class Diagram",
-        "Cài đặt từng module",
-        "Kiểm thử và hoàn thiện"
-    ]
+    task_lower = request.task_description.lower()
+
+    if "api" in task_lower or "backend" in task_lower:
+        checklist = [
+            "Thiết kế Database",
+            "Xây dựng API Endpoint",
+            "Viết Unit Test",
+            "Kiểm tra bằng Postman"
+        ]
+    elif "giao diện" in task_lower or "frontend" in task_lower:
+        checklist = [
+            "Phân tích yêu cầu UI",
+            "Thiết kế UI/UX",
+            "Code React/Vue",
+            "Responsive Mobile"
+        ]
+    else:
+        checklist = [
+            "Phân tích yêu cầu",
+            "Thực hiện task",
+            "Kiểm tra kết quả"
+        ]
 
     return {
         "status": "success",
@@ -54,38 +69,35 @@ def breakdown_task(task_id: int, request: TaskBreakdownRequest):
         "suggested_checklist": checklist
     }
 
-@ai_router.post("/ai/code/explain")
+@ai_router.post("/code/explain")
 def explain_code(request: CodeExplainRequest):
     return {
-        "status": "success",
         "analysis": {
-            "error_log": request.error_log,
-            "possible_reason": "Lỗi cú pháp hoặc thiếu import",
-            "suggestion": "Kiểm tra lại khai báo biến, hàm hoặc thư viện"
+            "possible_reason": "Biến chưa được khai báo trước khi sử dụng",
+            "suggestion": "Hãy kiểm tra lại tên biến và scope"
         }
     }
 
-@ai_router.post("/ai/resources/recommend")
+@ai_router.post("/resources/recommend")
 def recommend_resources(request: ResourceRequest):
-    resources = {
-        "CNPM": [
-            {"title": "Software Engineering - GeeksforGeeks", "link": "https://www.geeksforgeeks.org/software-engineering/"},
-            {"title": "SDLC Overview", "link": "https://www.tutorialspoint.com/sdlc"}
-        ],
+    data = {
         "AI": [
-            {"title": "IBM - What is AI", "link": "https://www.ibm.com/topics/artificial-intelligence"}
+            {"title": "AI Fundamentals - IBM", "link": "https://www.ibm.com"},
+            {"title": "Machine Learning Basics", "link": "https://developers.google.com"}
+        ],
+        "CNPM": [
+            {"title": "Software Engineering - Sommerville", "link": "https://example.com"}
         ]
     }
 
     return {
-        "status": "success",
         "topic": request.topic,
-        "resources": resources.get(request.topic, [])
+        "resources": data.get(request.topic, [])
     }
 
-@ai_router.get("/ai/history")
+@ai_router.get("/history")
 def get_chat_history():
     return {
-        "status": "success",
+        "total_conversations": len(chat_history),
         "history": chat_history
     }
