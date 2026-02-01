@@ -1,55 +1,78 @@
-# File: analytics_get.py
-from flask import Blueprint, jsonify
+from fastapi import APIRouter
 
-analytics_bp = Blueprint("analytics_bp", __name__)
+router = APIRouter(tags=["Analytics"])
 
-# --- 1. Dashboard Sinh Viên ---
-# Yêu cầu: Aggregation API (Deadlines sắp tới, Task đang làm, Thông báo mới)
-@analytics_bp.route("/dashboard/student", methods=["GET"])
-def get_student_dashboard():
-    # Giả lập việc query 3 bảng khác nhau trong Database rồi gộp lại
-    data = {
+@router.get("/dashboard/student")
+def dashboard_student():
+    """
+    Aggregation API:
+    - Deadlines sắp tới
+    - Task đang làm
+    - Thông báo mới
+    """
+    return {
         "deadlines_sap_toi": [
-            {"id": 1, "môn": "Lập trình Web", "tiêu_đề": "Nộp Assignment 1", "hạn": "2024-05-20", "trạng_thái": "Gấp"},
-            {"id": 2, "môn": "CSDL", "tiêu_đề": "Quiz Online Lab 3", "hạn": "2024-05-22", "trạng_thái": "Bình thường"}
+            {"mon_hoc": "Công nghệ phần mềm", "han_nop": "2026-02-10"},
+            {"mon_hoc": "Trí tuệ nhân tạo", "han_nop": "2026-02-15"}
         ],
-        "tasks_dang_lam": [
-            {"id": 101, "tên_task": "Thiết kế Figma", "tiến_độ": 50},
-            {"id": 102, "tên_task": "Viết API Backend", "tiến_độ": 30}
+        "task_dang_lam": [
+            "Thiết kế API Learning Analytics",
+            "Viết báo cáo nhóm"
         ],
         "thong_bao_moi": [
-            {"nguồn": "Phòng Đào Tạo", "nội_dung": "Lịch nghỉ lễ 30/4 - 1/5", "ngày": "2024-04-15"},
-            {"nguồn": "GVCN", "nội_dung": "Nhắc nhở đóng học phí kỳ Spring", "ngày": "2024-04-10"}
+            "Có bài tập mới môn CNPM",
+            "Lớp AI dời lịch học"
         ]
     }
-    return jsonify({"status": "success", "data": data})
 
-# --- 2. Dashboard Giảng Viên ---
-# Yêu cầu: Số bài cần chấm, Các nhóm chậm tiến độ
-@analytics_bp.route("/dashboard/lecturer", methods=["GET"])
-def get_lecturer_dashboard():
-    data = {
-        "thong_ke_can_cham": {
-            "tong_so": 15,
-            "chi_tiet": "5 bài Lab, 10 bài Assignment"
-        },
+
+@router.get("/dashboard/lecturer")
+def dashboard_lecturer():
+    """
+    Aggregation API:
+    - Số bài cần chấm
+    - Các nhóm chậm tiến độ
+    """
+    return {
+        "so_bai_can_cham": 18,
         "nhom_cham_tien_do": [
-            {"nhom": "Group 01", "du_an": "Web Bán Hàng", "tre_han": "3 ngày"},
-            {"nhom": "Group 05", "du_an": "App Điểm Danh", "tre_han": "5 ngày"}
+            {
+                "ten_nhom": "Nhóm 01",
+                "du_an": "Website bán hàng",
+                "tre_han": "3 ngày"
+            },
+            {
+                "ten_nhom": "Nhóm 05",
+                "du_an": "App điểm danh",
+                "tre_han": "5 ngày"
+            }
         ]
     }
-    return jsonify({"status": "success", "data": data})
 
-# --- 3. Analytics Trưởng Bộ Môn ---
-# Yêu cầu: Thống kê mức độ đạt chuẩn đầu ra (CLO)
-@analytics_bp.route("/analytics/clo-attainment", methods=["GET"])
-def get_clo_stats():
-    data = {
-        "mon_hoc": "IT101 - Nhập môn Lập trình",
-        "thong_ke_clo": [
-            {"clo_code": "CLO1", "mo_ta": "Tư duy logic", "dat_chuan": "85%"},
-            {"clo_code": "CLO2", "mo_ta": "Kỹ năng Code", "dat_chuan": "70%"},
-            {"clo_code": "CLO3", "mo_ta": "Làm việc nhóm", "dat_chuan": "92%"}
+
+@router.get("/analytics/clo-attainment")
+def clo_attainment():
+    """
+    Thống kê mức độ đạt chuẩn đầu ra (CLO)
+    Dành cho Trưởng bộ môn
+    """
+    return {
+        "mon_hoc": "IT101 - Nhập môn lập trình",
+        "clo_attainment": [
+            {
+                "clo": "CLO1",
+                "mo_ta": "Tư duy logic",
+                "ty_le_dat": 85
+            },
+            {
+                "clo": "CLO2",
+                "mo_ta": "Kỹ năng lập trình",
+                "ty_le_dat": 78
+            },
+            {
+                "clo": "CLO3",
+                "mo_ta": "Làm việc nhóm",
+                "ty_le_dat": 90
+            }
         ]
     }
-    return jsonify({"status": "success", "data": data})
