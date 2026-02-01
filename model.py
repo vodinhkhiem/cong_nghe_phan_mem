@@ -4,6 +4,84 @@ from infrastructure.databases.base import Base
 from datetime import datetime
 from typing import Optional
 
+class TokenBlocklistModel(Base):
+    __tablename__ = 'token_blocklist'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    jti = Column(String(36), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.datetime.utcnow)
+
+class TaskChecklistModel(Base):
+    __tablename__ = 'task_checklists'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    task_id = Column(Integer, ForeignKey('tasks.id'))
+    content = Column(String(500), nullable=False)
+    is_done = Column(Boolean, default=False)
+    task = relationship("TaskModel", back_populates="checklists")
+
+class TaskActivityModel(Base):
+    __tablename__ = 'task_activities'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    task_id = Column(Integer, ForeignKey('tasks.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    action = Column(String(500)) 
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    task = relationship("TaskModel", back_populates="activities")
+    user = relationship("UserModel")
+
+class TaskCommentModel(Base):
+    __tablename__ = 'task_comments'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    task_id = Column(Integer, ForeignKey('tasks.id'))
+    user_id = Column(Integer, ForeignKey('users.id'))
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    user = relationship("UserModel")
+    task = relationship("TaskModel", back_populates="comments")
+
+class TaskAttachmentModel(Base):
+    __tablename__ = 'task_attachments'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    task_id = Column(Integer, ForeignKey('tasks.id'))
+    url = Column(String(500), nullable=False)
+    name = Column(String(255))
+    task = relationship("TaskModel", back_populates="attachments")
+
+class MeetingAttendeeModel(Base):
+    __tablename__ = 'meeting_attendees'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    meeting_id = Column(Integer, ForeignKey('meetings.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    status = Column(String(20), default='Pending')
+    
+    # Quan hệ
+    meeting = relationship("MeetingModel", back_populates="attendees")
+    user = relationship("UserModel")
+
+class GradeModel(Base):
+    __tablename__ = 'grades'
+    id = Column(Integer, primary_key=True)
+    submission_id = Column(Integer, ForeignKey('submissions.id'))
+    score = Column(Float)
+    feedback = Column(Text)
+    graded_by = Column(Integer, ForeignKey('users.id'))
+
+class AIChatHistoryModel(Base):
+    __tablename__ = 'ai_chat_histories'
+    
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
+    # 'user' hoặc 'bot'
+    sender = Column(String(50), nullable=False) 
+    # Nội dung tin nhắn
+    message = Column(Text, nullable=False)
+    # Gom nhóm các đoạn chat (nếu cần context liên tục)
+    conversation_id = Column(String(100), nullable=True)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+    # quan hệ
+    user = relationship("UserModel")
+
 class SyllabusModel(Base):
     __tablename__ = 'syllabuses'
     
